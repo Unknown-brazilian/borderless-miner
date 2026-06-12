@@ -32,6 +32,13 @@ abstract class S {
   String get rewardDestination;
   String get exampleAddrWarning;
   String get scanDestinationBtn;
+  String get enterDestinationBtn;
+  String get enterAddressTitle;
+  String get enterAddressHint;
+  String get invalidAddress;
+  String get pasteBtn;
+  String get cancelBtn;
+  String get saveBtn;
 
   // controle
   String get startMining;
@@ -110,6 +117,14 @@ class _Pt extends S {
   @override String get exampleAddrWarning =>
       '⚠️ Endereço de exemplo. Escaneie o SEU endereço antes de minerar.';
   @override String get scanDestinationBtn => 'Escanear endereço de destino';
+  @override String get enterDestinationBtn => 'Digitar / colar endereço';
+  @override String get enterAddressTitle => 'Endereço de destino';
+  @override String get enterAddressHint => 'Cole ou digite o endereço Bitcoin';
+  @override String get invalidAddress =>
+      'Endereço Bitcoin inválido. Verifique e tente de novo.';
+  @override String get pasteBtn => 'Colar';
+  @override String get cancelBtn => 'Cancelar';
+  @override String get saveBtn => 'Salvar';
 
   @override String get startMining => 'COMEÇAR A MINERAR';
   @override String get stopMining => 'PARAR MINERAÇÃO';
@@ -198,6 +213,14 @@ class _En extends S {
   @override String get exampleAddrWarning =>
       '⚠️ Example address. Scan YOUR address before mining.';
   @override String get scanDestinationBtn => 'Scan destination address';
+  @override String get enterDestinationBtn => 'Type / paste address';
+  @override String get enterAddressTitle => 'Destination address';
+  @override String get enterAddressHint => 'Paste or type the Bitcoin address';
+  @override String get invalidAddress =>
+      'Invalid Bitcoin address. Check it and try again.';
+  @override String get pasteBtn => 'Paste';
+  @override String get cancelBtn => 'Cancel';
+  @override String get saveBtn => 'Save';
 
   @override String get startMining => 'START MINING';
   @override String get stopMining => 'STOP MINING';

@@ -10,6 +10,7 @@ import '../l10n/l10n.dart';
 import '../mining/miner.dart';
 import '../mining/stratum_client.dart';
 import '../models/format.dart';
+import '../services/btc_address.dart';
 import '../services/pool_api.dart';
 import '../theme.dart';
 import 'scan_address_screen.dart';
@@ -52,6 +53,97 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _scanAddress() async {
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(builder: (_) => const ScanAddressScreen()),
+    );
+    if (result != null && result.isNotEmpty) {
+      await _miner.setAddress(result);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tr.destinationUpdated)),
+        );
+      }
+      await _refreshPool();
+    }
+  }
+
+  /// Abre um diálogo para digitar/colar o endereço de destino em texto.
+  /// Valida com o mesmo BtcAddress.isValid usado no scanner antes de salvar.
+  Future<void> _enterAddress() async {
+    final controller = TextEditingController(
+      text: _miner.address == MinerConfig.bitcoinAddress ? '' : _miner.address,
+    );
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        String? error;
+        return StatefulBuilder(
+          builder: (ctx, setLocal) {
+            Future<void> paste() async {
+              final data = await Clipboard.getData(Clipboard.kTextPlain);
+              final text = data?.text;
+              if (text != null && text.trim().isNotEmpty) {
+                controller.text = text.trim();
+                controller.selection = TextSelection.fromPosition(
+                    TextPosition(offset: controller.text.length));
+                setLocal(() => error = null);
+              }
+            }
+
+            void submit() {
+              final raw = controller.text.trim();
+              if (BtcAddress.isValid(raw)) {
+                Navigator.of(ctx).pop(BtcAddress.parse(raw));
+              } else {
+                setLocal(() => error = tr.invalidAddress);
+              }
+            }
+
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              title: Text(tr.enterAddressTitle),
+              content: TextField(
+                controller: controller,
+                autofocus: true,
+                minLines: 1,
+                maxLines: 3,
+                autocorrect: false,
+                enableSuggestions: false,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                onChanged: (_) {
+                  if (error != null) setLocal(() => error = null);
+                },
+                onSubmitted: (_) => submit(),
+                decoration: InputDecoration(
+                  hintText: tr.enterAddressHint,
+                  errorText: error,
+                  errorMaxLines: 2,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.content_paste,
+                        color: AppColors.bitcoin),
+                    tooltip: tr.pasteBtn,
+                    onPressed: paste,
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(tr.cancelBtn,
+                      style: const TextStyle(color: AppColors.textMuted)),
+                ),
+                ElevatedButton(
+                  onPressed: submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.bitcoin,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: Text(tr.saveBtn,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
     if (result != null && result.isNotEmpty) {
       await _miner.setAddress(result);
@@ -268,6 +360,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               icon: const Icon(Icons.qr_code_scanner),
               label: Text(tr.scanDestinationBtn,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+              onPressed: _enterAddress,
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.bitcoin,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              icon: const Icon(Icons.keyboard, size: 18),
+              label: Text(tr.enterDestinationBtn,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
