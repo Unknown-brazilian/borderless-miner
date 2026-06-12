@@ -1,0 +1,25 @@
+name: borderless_miner
+description: "Lottery Bitcoin solo miner para celulares antigos — aponta para public-pool.io"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  crypto: ^3.0.3          # SHA-256 (merkle root + validação base58check)
+  ffi: ^2.1.0             # ponte com o núcleo de hashing em C
+  http: ^1.2.0            # consulta a API da public-pool
+  mobile_scanner: ^5.2.3  # ler QR do endereço de destino pela câmera
+  qr_flutter: ^4.1.0      # QR code do link da Binance (offline)
+  shared_preferences: ^2.3.2 # guarda o endereço de destino escolhido
+  url_launcher: ^6.3.0    # abre o link da Binance / explorer
+  wakelock_plus: ^1.2.5   # mantém a tela/CPU acordada enquanto minera
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
